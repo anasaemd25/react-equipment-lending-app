@@ -1,0 +1,43 @@
+### 1. Health Check
+GET http://localhost:3001/api/health
+
+### 2. Get all items
+GET http://localhost:3001/api/items
+
+### 3. Get one existing item
+GET http://localhost:3001/api/items/1
+
+### 4. Get a missing item (Should return 404 Not Found)
+GET http://localhost:3001/api/items/999
+
+### 5. Create a new item (Valid - Should return 201 Created)
+POST http://localhost:3001/api/items
+Content-Type: application/json
+
+{
+  "name": "4K Video Camera",
+  "category": "Video",
+  "location": "Studio B",
+  "condition": "Excellent",
+  "dailyPrice": 25,
+  "available": true
+}
+
+### 6. Create an item with missing data (Invalid - Should return 400 Bad Request)
+POST http://localhost:3001/api/items
+Content-Type: application/json
+
+{
+  "name": "Broken Request Missing Category and Price"
+}
+
+### 7. Update item availability (PATCH - Should return 200 OK)
+PATCH http://localhost:3001/api/items/1
+Content-Type: application/json
+
+{
+  "available": false
+}
+
+### 8. Delete an item by ID (DELETE - Should return 200 OK)
+DELETE http://localhost:3001/api/items/1
