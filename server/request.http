@@ -1,37 +1,48 @@
-### 1. Health Check
+### 1. Health Check Request
+# Expected status: 200 OK
 GET http://localhost:3001/api/health
 
-### 2. Get all items
+### 2. Collection GET (Fetch all equipment)
+# Expected status: 200 OK
 GET http://localhost:3001/api/items
 
-### 3. Get one existing item
+### 3. Found Item GET (Fetch item ID 1)
+# Expected status: 200 OK
 GET http://localhost:3001/api/items/1
 
-### 4. Get a missing item (Should return 404 Not Found)
+### 4. Missing Item GET (Fetch non-existent ID 999)
+# Expected status: 404 Not Found
 GET http://localhost:3001/api/items/999
 
-### 5. Create a new item (Valid - Should return 201 Created)
+### 5. Invalid-ID Item GET (Fetch with non-numeric ID 'abc')
+# Expected status: 400 Bad Request
+GET http://localhost:3001/api/items/abc
+
+### 6. Valid POST Request (Create new equipment item)
+# Expected status: 201 Created
 POST http://localhost:3001/api/items
 Content-Type: application/json
 
 {
-  "name": "4K Video Camera",
+  "name": "4K Studio Camera",
   "category": "Video",
   "location": "Studio B",
   "condition": "Excellent",
-  "dailyPrice": 25,
+  "dailyPrice": 35,
   "available": true
 }
 
-### 6. Create an item with missing data (Invalid - Should return 400 Bad Request)
+### 7. Invalid POST Request (Missing required fields)
+# Expected status: 400 Bad Request
 POST http://localhost:3001/api/items
 Content-Type: application/json
 
 {
-  "name": "Broken Request Missing Category and Price"
+  "name": "Incomplete Camera"
 }
 
-### 7. Update item availability (PATCH - Should return 200 OK)
+### 8. Valid PATCH Request (Update availability for item 1)
+# Expected status: 200 OK
 PATCH http://localhost:3001/api/items/1
 Content-Type: application/json
 
@@ -39,5 +50,32 @@ Content-Type: application/json
   "available": false
 }
 
-### 8. Delete an item by ID (DELETE - Should return 200 OK)
+### 9. Invalid PATCH Request (Sending unknown field)
+# Expected status: 400 Bad Request
+PATCH http://localhost:3001/api/items/1
+Content-Type: application/json
+
+{
+  "unknownField": "Hack Attempt"
+}
+
+### 10. PATCH Request for Missing Item
+# Expected status: 404 Not Found
+PATCH http://localhost:3001/api/items/999
+Content-Type: application/json
+
+{
+  "available": false
+}
+
+### 11. Successful DELETE Request (Delete item 1)
+# Expected status: 200 OK
 DELETE http://localhost:3001/api/items/1
+
+### 12. DELETE Request for Missing Item
+# Expected status: 404 Not Found
+DELETE http://localhost:3001/api/items/999
+
+### 13. Unmatched Endpoint Request
+# Expected status: 404 Not Found
+GET http://localhost:3001/api/unknown-route
