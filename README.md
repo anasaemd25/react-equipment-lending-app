@@ -2,67 +2,87 @@
 
 ## 1. Application Purpose
 
-This is a full-stack web application built for a school, makerspace, or club to manage an equipment lending catalogue. Users can browse available equipment, search and filter the list, view specific item details, and add, edit, or delete items.
+This full stack web application provides an equipment lending catalogue for a school. Users can browse available equipment, search and filter items, view item details, and add, edit or delete equipment.
 
 ## 2. Required Software
 
 To run this project, you need:
 
 - **Node.js** installed on your computer.
-- A terminal (Command Prompt, PowerShell, or Mac/Linux Terminal).
-- A web browser (Chrome, Firefox, Edge, etc.).
+- A terminal, such as Command Prompt, PowerShell, or a macOS/Linux terminal.
+- A web browser, such as Chrome, Firefox, or Edge.
 
 ## 3. Installation and Start Commands
 
-Because this project has two separate parts (frontend and backend), you need to run two terminal windows at the same time.
+The application consists of 2 parts: a React frontend and an Express backend. Both must run at the same time in separate terminal windows.
 
-**Step 1: Start the Backend (Express API)**
+### Step 1: Start the Backend (Express API)
 
-1. Open a terminal and navigate to the server folder: `cd server`
-2. Install dependencies: `npm install`
-3. Start the server: `npm run dev`
+1. Open a terminal and navigate to the backend folder:
 
-**Step 2: Start the Frontend (React)**
+    ```bash
+    cd server
+    ```
 
-1. Open a second terminal and navigate to the main project folder: `cd equipment-app` (or just stay in the root if already there)
-2. Install dependencies: `npm install`
-3. Start the React app: `npm run dev`
+2. Install the dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Start the backend server:
+
+    ```bash
+    npm run dev
+    ```
+
+### Step 2: Start the Frontend (React)
+
+1. Open a second terminal and navigate to the project root directory (`equipment-app`).
+
+2. Install the frontend dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Start the React development server:
+
+    ```bash
+    npm run dev
+    ```
 
 ## 4. Development URLs and Ports
 
-- **Frontend (React UI):** Runs on `http://localhost:5173`
-- **Backend (Express API):** Runs on `http://localhost:3001`
+- **Frontend (React):** http://localhost:5173
+- **Backend (Express API):** http://localhost:3001
 
-## 5. Browser Route Table (Frontend)
+## 5. Frontend Routes
 
-| Browser Path      | View Description                                                     |
-| :---------------- | :------------------------------------------------------------------- |
-| `/`               | Home page with a short welcome explanation.                          |
-| `/items`          | Searchable and filterable equipment list with borrow/delete buttons. |
-| `/items/new`      | Blank form to add a new piece of equipment.                          |
-| `/items/:id`      | Detailed view for one specific item.                                 |
-| `/items/:id/edit` | Pre-filled form to update an existing item.                          |
-| `/external`       | Read-only view showing external tech products.                       |
-| `*`               | 404 Fallback page for unknown URLs.                                  |
+| Browser Path      | Description                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `/`               | Home page with a welcome message and application introduction.                |
+| `/items`          | Searchable and filterable equipment list with borrowing and deletion actions. |
+| `/items/new`      | Form for adding new equipment.                                                |
+| `/items/:id`      | Detailed view of a specific equipment item.                                   |
+| `/items/:id/edit` | Form for editing an existing equipment item.                                  |
+| `/external`       | Read-only page displaying products from an external API.                      |
+| `*`               | Fallback page for unknown routes (404).                                       |
 
-## 6. API Endpoint Table (Backend)
+## 6. Backend API Endpoints
 
-| Method & Path        | Successful Response                                              |
-| :------------------- | :--------------------------------------------------------------- |
-| `GET /api/health`    | `200 OK` JSON confirming the server is alive.                    |
-| `GET /api/items`     | `200 OK` JSON array containing all equipment.                    |
-|                      |
-| `GET /api/items/:id` | `200 OK` JSON object for one specific item                       |
-|                      |
-| `POST /api/items`    | `201 Created` JSON containing the newly created item with its ID |
+| HTTP Method and Path    | Successful Response                                                       |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `GET /api/health`       | `200 OK` — JSON response confirming that the server is running.           |
+| `GET /api/items`        | `200 OK` — JSON array containing all equipment items.                     |
+| `GET /api/items/:id`    | `200 OK` — JSON object containing the requested item.                     |
+| `POST /api/items`       | `201 Created` — JSON object containing the newly created item and its ID. |
+| `PATCH /api/items/:id`  | `200 OK` — JSON object containing the updated item.                       |
+| `DELETE /api/items/:id` | `200 OK` — JSON response confirming that the item was deleted.            |
 
-|  
-| `PATCH /api/items/:id` | `200 OK` JSON containing the complete updated item. |
-| `DELETE /api/items/:id` | `200 OK` JSON confirming the item was removed. |
+## 7. Data Structure and Validation
 
-## 7. Data Shape and Validation Summary
-
-Every equipment item uses this exact data shape:
+Each equipment item follows this data structure:
 
 ```json
 {
@@ -75,3 +95,71 @@ Every equipment item uses this exact data shape:
     "available": true
 }
 ```
+
+### Backend Validation Rules
+
+- `name`, `category`, `location`, and `condition` must be non empty strings.
+- `dailyPrice` must be a valid number greater than or equal to `0`.
+- `available` must be a boolean (`true` or `false`).
+- `id` must be a positive integer generated by the server.
+- Invalid input returns a `400 Bad Request` response.
+- Unknown fields are rejected.
+
+## 8. In-Memory Data and Reset Behaviour
+
+The app does not use a permanent database. Equipment data is stored temporarily in memory in a JavaScript array defined in `data.js`.
+
+When the backend server is stopped and restarted, any equipment added, edited, or deleted during the previous session is lost. The application then returns to its original default equipment list.
+
+To stop the backend server, press `Ctrl+C` in the terminal where it is running.
+
+## 9. External API
+
+The `/external` page retrieves read-only product data from the public [DummyJSON API](https://dummyjson.com/products?limit=6).
+
+The endpoint used is:
+
+`https://dummyjson.com/products?limit=6`
+
+This external data is separate from the application's Express API and is used to display a selection of sample technology accessories. The products are displayed for reference and are not stored in the application's equipment list.
+
+## 10. Successful Request Flow
+
+**Example:** A user enters "Projector" in the Add Equipment form and clicks **Save Equipment**.
+
+1. **React Form:** The form's `e.preventDefault()` prevents the browser from reloading the page. React collects the entered values into a JavaScript object.
+
+2. **API Request:** The function in `src/api.js` sends an HTTP `POST` request containing the equipment data as JSON to `http://localhost:3001/api/items`.
+
+3. **Express Server:** The backend parses the JSON request using `express.json()` and validates the submitted fields. If the data is valid, the server generates a new ID, adds the item to the in-memory array, and returns a `201 Created` response containing the new item.
+
+4. **Frontend Response:** The API helper processes the successful response and returns the item data to the React component.
+
+5. **Visible Result:** The frontend uses `useNavigate('/items')` to navigate to the equipment list. The newly created "Projector" appears in the list.
+
+## 11. Failed Request Flow
+
+**Example:** A user clicks the Delete button for an equipment item while the Express server is offline.
+
+1. **User Action:** The user confirms the deletion, and React attempts to send an HTTP `DELETE` request to the backend.
+
+2. **Network Failure:** Because the backend is not running on port `3001`, the request cannot reach the server and the fetch operation fails.
+
+3. **Error Handling:** The error-handling logic in `src/api.js` detects the failed request and reports a JavaScript error.
+
+4. **Visible Feedback:** The error is caught by the relevant error handler in `ItemList.jsx`, which displays an alert such as `Error: Failed to fetch`.
+
+5. **Data Integrity:** Since the server did not confirm the deletion, the frontend does not remove the item from the displayed list. The item remains visible.
+
+## 12. Known Limitations
+
+- Equipment data is stored in memory and is not permanently saved.
+- The application does not include user accounts, authentication, or permission roles.
+- No payment processing system is integrated.
+- External product information is read-only and is not part of the application's equipment inventory.
+
+## 13. AI Assistance Statement
+
+I used Gemini as a learning aid/assistant to help me understand React and Express concepts, including `useState`, `useEffect`, and `react-router-dom`. Gemini also helped me understand how to organize the application into separate files and how the frontend communicates with the backend.
+
+I reviewed the code and used questions and testing to improve my understanding of its logic. I can explain the application's data flow, routing, API requests, validation, error handling, and state changes.
